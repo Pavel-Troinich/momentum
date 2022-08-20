@@ -122,3 +122,25 @@ async function getWeather() {
 
 getWeather();
 
+// getQuote()
+
+const quote = document.querySelector('.quote');
+const author = document.querySelector('.author');
+
+function getQuote() {
+  let xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "https://quotes.rest/qod", true);
+  xhttp.setRequestHeader("X-Theysaidso-Api-Secret", "saturn");
+  xhttp.send();
+  xhttp.onload = function() {
+    if (xhttp.status != 200) {
+      alert(`Ошибка ${xhttp.status}: ${xhttp.statusText}`);
+    } else {
+      let responseObj = JSON.parse(xhttp.response);
+      quote.textContent = `${responseObj.contents.quotes[0].quote}`;
+      author.textContent = `${responseObj.contents.quotes[0].author}`;
+    }
+  };
+};
+
+getQuote()

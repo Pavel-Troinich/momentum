@@ -29,7 +29,7 @@ function getTimeOfDay() {
   let timeOfDay = '';
   if (hours >= 0 && hours < 6) timeOfDay = 'night';
   else if (hours >= 6 && hours <= 12) timeOfDay = 'morning';
-  else if (hours >= 12 && hours < 18) timeOfDay = 'day';
+  else if (hours >= 12 && hours < 18) timeOfDay = 'afternoon';
   else if (hours >= 18 && hours < 24) timeOfDay = 'evening';
   return timeOfDay
 }
@@ -44,11 +44,13 @@ const name = document.querySelector('.name');
 
 function setLocalItem() {
   localStorage.setItem('name', name.value);
+  localStorage.setItem('city', city.value);
 };
 
 function getLocalItem() {
   if(localStorage.getItem('name')) {
     name.value = localStorage.getItem('name');
+    city.value = localStorage.getItem('city');
   }
 };
 
@@ -74,20 +76,17 @@ function setBG() {
   img.onload = () => {      
     document.body.style.backgroundImage = `url(${img.src})`;
   };
-  console.log(img.src);
 }
 
 setBG();
 
 function slideNext() {
-  if (randomNum === 20) randomNum = 1;
-  else randomNum++;
+  (randomNum === 20) ? randomNum = 1 : randomNum++;
   setBG();
 };
 
 function slidePrev() {
-  if (randomNum === 1) randomNum = 20;
-  else randomNum--;
+  (randomNum === 1) ? randomNum = 20 : randomNum--;
   setBG();
 };
 
@@ -96,3 +95,52 @@ const prevBtn = document.querySelector('.slide-prev');
 
 nextBtn.addEventListener('click', slideNext);
 prevBtn.addEventListener('click', slidePrev);
+
+// Weather
+
+const weatherIcon = document.querySelector('.weather-icon');
+const temperature = document.querySelector('.temperature');
+const weatherDescription = document.querySelector('.weather-description');
+const wind = document.querySelector('.wind');
+const humidity = document.querySelector('.humidity');
+
+const city = document.querySelector('.city');
+city.addEventListener('change', getWeather);
+
+async function getWeather() {
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&lang=ru&appid=4311e3e2747fbe3f5dadc9a4fee1bec0&units=metric`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  weatherIcon.className = 'weather-icon owf';
+  weatherIcon.classList.add(`owf-${data.weather[0].id}`);
+  temperature.textContent = `${data.main.temp}°C`;
+  weatherDescription.textContent = `${data.weather[0].main}`
+  wind.textContent = `Wind ${data.wind.speed} m/s`;
+  humidity.textContent = `Hum. ${data.main.humidity}%`;
+};
+
+getWeather();
+
+// getQuote()
+
+const quote = document.querySelector('.quote');
+const author = document.querySelector('.author');
+
+function getQuote() {
+  let xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "https://quotes.rest/qod", true);
+  xhttp.setRequestHeader("X-Theysaidso-Api-Secret", "saturn");
+  xhttp.send();
+  xhttp.onload = function() {
+    if (xhttp.status != 200) {
+      alert(`Ошибка ${xhttp.status}: ${xhttp.statusText}`);
+    } else {
+      let responseObj = JSON.parse(xhttp.response);
+      quote.textContent = `${responseObj.contents.quotes[0].quote}`;
+      author.textContent = `${responseObj.contents.quotes[0].author}`;
+    }
+  };
+};
+
+getQuote()
